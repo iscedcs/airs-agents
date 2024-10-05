@@ -2,7 +2,6 @@ import DashboardCard from "@/components/layout/dashboard-card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getVehicleById } from "@/lib/controllers/vehicle-controller";
-import { getVehicleWaiver } from "@/lib/controllers/waiver.controller";
 import { getSSession } from "@/lib/get-data";
 import { failureIcon, successIcon } from "@/lib/icons";
 import { addDays, format } from "date-fns";
@@ -33,7 +32,7 @@ export default async function StatusPage({
      const { role } = await getSSession();
      const vehicle = await getVehicleById(params.bcid);
      if (!vehicle) return notFound();
-     const waivers = await getVehicleWaiver(params.bcid);
+     // const waivers = await getVehicleWaiver(params.bcid);
      const onWaiver = false;
 
      const isOwing = false;

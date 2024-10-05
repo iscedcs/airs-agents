@@ -1,8 +1,6 @@
 "use client";
-import { useRouter } from "next/navigation";
 
 export default function AdminsPageNotFound() {
-     const router = useRouter();
      return (
           <div className="grid w-full place-items-center">
                {/* <div className='flex flex-col items-center justify-center text-center'>

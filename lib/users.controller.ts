@@ -1,6 +1,6 @@
 import { options } from "@/app/api/auth/options";
 import { getServerSession } from "next-auth";
-import { API, URLS } from "../consts";
+import { API, URLS } from "./const";
 
 export const getUsers = async (o: {
      page?: string;

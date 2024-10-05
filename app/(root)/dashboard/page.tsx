@@ -6,9 +6,17 @@ import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
      const session = await getServerSession(options);
-     const ROLE = session?.user.role;
+     
+     if(!session || !session.user) {
+          redirect("/login");
+     }
+
+     
+     const ROLE = session.user.role;
      if (ROLE?.toLowerCase() === "greenengine_agent") redirect("/green-engine");
-     const user = await getUser(session?.user.id!);
+
+     const user = await getUser(session.user.id);
+     
      return (
           <div className="flex w-full flex-col gap-5 p-3 md:p-5">
                <div className="text-title2Bold md:text-h5Bold">

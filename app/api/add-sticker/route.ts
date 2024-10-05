@@ -1,4 +1,4 @@
-import { API, URLS } from "@/lib/consts";
+import { API, URLS } from "@/lib/const";
 import { getSSession } from "@/lib/get-data";
 import { NextRequest, NextResponse } from "next/server";
 
