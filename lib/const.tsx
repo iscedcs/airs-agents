@@ -28,16 +28,50 @@ export const SLIDES = [
     // 	/>
     // </>,
 ];
+export const LOGIN_DETAILS = [
+  {
+    title: "User ID",
+    entry: "AgentISCE",
+  },
+  {
+    title: "Password",
+    entry: "IsaacE2000",
+  },
+];
 
+export const PERSONAL_INFORMATION = [
+  {
+    title: "Name",
+    entry: "Isaac Emperor",
+  },
+  {
+    title: "E-mail Address",
+    entry: "IsaacEmperor@gmail.com",
+  },
+  {
+    title: "Phone Number",
+    entry: "080-332-7264",
+  },
+];
+export const ADDRESS_INFORMATION = [
+  {
+    title: "Address",
+    entry: "No, 14 Agbero Road, Anambra",
+  },
+  {
+    title: "Area Location",
+    entry: "Mile 1-3",
+  },
+];
 export enum WAIVER_STATUS {
-     approved = "APPROVED",
-     declined = "DECLINED",
-     pending = "PENDING",
-     cancelled = "CANCELLED",
+  approved = "APPROVED",
+  declined = "DECLINED",
+  pending = "PENDING",
+  cancelled = "CANCELLED",
 }
 export const API =
-     process.env.TEST_BACKEND_URL ||
-     "https://generally-equal-elephant.ngrok-free.app";
+  process.env.LIVE_BACKEND_URL ||
+  "https://generally-equal-elephant.ngrok-free.app";
 export const URLS = {
      activity: {
           all: "/api/v1/activities",
