@@ -41,7 +41,9 @@ export const getUser = async (id: string) => {
           const result = await res.json();
           if (!result.status) return undefined;
           const user: IUserExtended = result.data;
+          console.log(user);
           return user;
+          
      } catch {
           return null;
      }
