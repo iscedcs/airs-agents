@@ -37,7 +37,11 @@ export const options: NextAuthOptions = {
                               return null;
                          } else {
                               const user: User = result?.data;
-                              return user;
+                              if (user.role === 'AGENT'){
+                                   return user;
+                              } else {
+                                   return null;
+                              }
                          }
                     } catch (error: any) {
                          console.log("error from login options ", { error });
