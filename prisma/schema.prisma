@@ -254,7 +254,7 @@ model vehicles {
   deleted_at               DateTime?                  @db.Timestamp(6)
   color                    String?                    @db.VarChar
   category                 String?                    @db.VarChar
-  plate_number             String                     @db.VarChar
+  plate_number             String?                    @db.VarChar
   image                    String?                    @db.VarChar
   blacklisted              Boolean                    @default(false)
   status                   vehicles_status_enum       @default(ACTIVE)

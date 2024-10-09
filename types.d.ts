@@ -235,6 +235,12 @@ interface IWallet {
     amount_owed: string;
     net_total: string;
     next_transaction_date: string;
+    cvof_balance: string;
+    fareflex_balance: string;
+    isce_balance: string;
+    cvof_owing: string;
+    fareflex_owing: string;
+    isce_owing: string;
 }
 
 interface IOwner {

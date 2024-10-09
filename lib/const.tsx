@@ -536,3 +536,11 @@ export const BUS_IMAGE_SAMPLE =
                     "Authorities can monitor the entire process and generate detailed reports for auditing and analysis.",
           },
      ];
+     export enum VehicleValues {
+          TRICYCLE = 333,
+          SHUTTLE_BUS = 400,
+          BUS_INTRASTATE = 500,
+          TRUCKS = 500,
+          BUS_INTERSTATE = 666,
+          OTHERS = 333,
+     }

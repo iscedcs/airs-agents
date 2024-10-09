@@ -1,12 +1,19 @@
-import DashboardCard from "@/components/layout/dashboard-card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { VehicleValues } from "@/lib/const";
 import { getVehicleById } from "@/lib/controllers/vehicle-controller";
 import { getSSession } from "@/lib/get-data";
-import { failureIcon, successIcon } from "@/lib/icons";
-import { addDays, format } from "date-fns";
-import { MapPin } from "lucide-react";
-import Link from "next/link";
+import { cn, getNextPaymentDate } from "@/lib/utils";
+import { vehicle_transactions_transaction_category_enum } from "@prisma/client";
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
+import {
+     AlertTriangle,
+     Car,
+     CheckCircle2,
+     FileText,
+     User,
+     Wallet,
+} from "lucide-react";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata({
@@ -32,327 +39,358 @@ export default async function StatusPage({
      const { role } = await getSSession();
      const vehicle = await getVehicleById(params.bcid);
      if (!vehicle) return notFound();
-     // const waivers = await getVehicleWaiver(params.bcid);
-     const onWaiver = false;
 
+     const wallet = vehicle?.wallet;
+
+     const isVehicleClear =
+          vehicle.status === "ACTIVE" && Number(wallet.cvof_owing) === 0;
+     const CVOFBalance = Number(wallet.cvof_balance);
+     const CVOFOwing = Number(wallet.cvof_owing);
+
+     const isValidCategory =
+          vehicle.category !==
+          vehicle_transactions_transaction_category_enum.OTHERS;
      const isOwing = false;
+     const hasFareFlex =
+          !!vehicle.fairFlexImei && vehicle.fairFlexImei.trim() !== "";
+     const hasSticker = !!vehicle.barcode && vehicle.barcode.trim() !== "";
      // const dateSupplied = new Date(vehicle.wallet.next_transaction_date);
      // dateSupplied.setUTCHours(dateSupplied.getUTCHours() + 2);
 
      return (
-          <div className="w-full">
-               <div className="flex h-full w-full flex-col gap-6 p-6">
-                    <div className="flex w-full flex-col justify-between gap-1 text-center">
-                         <div className="text-sm">
-                              <div className="uppercase">{`Vehicle Owner`}</div>
-                              <div className="text-xl font-bold">
-                                   {vehicle.owner.name}
-                              </div>
-                         </div>
-                         <div className="text-sm uppercase">
-                              <div className="">Plate number</div>
-                              <div className="text-xl font-bold">
-                                   {vehicle.plate_number}
-                              </div>
-                         </div>
-                         <div
-                              className={`text-sm uppercase ${
-                                   isOwing
-                                        ? "text-red-500"
-                                        : "text-awesome-foreground"
-                              }`}
-                         >
-                              <div className="">Next Payment Date</div>
-                              <div className="text-xl font-bold">
-                                   {format(
-                                        addDays(new Date(), 2),
-                                        "MMMM d, yyyy",
-                                   )}
-                              </div>
-                         </div>
-                         {/* {vehicle.wallet.wallet_balance && (
-                              <div className="text-sm uppercase">
-                                   <div className="">Total Payment</div>
-                                   <div className="text-xl font-bold text-awesome-foreground">
-                                        ₦{vehicle.wallet.net_total}
-                                   </div>
-                              </div>
-                         )}
-                         {vehicle.wallet.wallet_balance && (
-                              <div className="text-sm uppercase">
-                                   <div className="">Wallet Balance</div>
-                                   <div className="text-xl font-bold text-awesome-foreground">
-                                        ₦{vehicle.wallet.wallet_balance}
-                                   </div>
-                              </div>
-                         )} */}
-
-                         {role &&
-                              vehicle.fairFlexImei &&
-                              vehicle.fairFlexImei !== "" && (
-                                   <Button
-                                        className="mx-auto w-full max-w-xl rounded-xl bg-primary-800 text-white"
-                                        asChild
-                                        variant={"default"}
-                                   >
-                                        <Link
-                                             href={`/vehicles/${params.bcid}/location`}
-                                             className="shrink-0 whitespace-nowrap"
-                                        >
-                                             <MapPin className="mr-2 h-4 w-4 shrink-0" />
-                                             View live location
-                                        </Link>
-                                   </Button>
-                              )}
+          <div className="p-2">
+               {!isValidCategory && (
+                    <div className="mb-2 flex flex-col items-center justify-center text-center font-bold uppercase text-destructive-foreground">
+                         <ExclamationTriangleIcon className="h-10 w-10" />
+                         Meet an agent to update vehicle category and add
+                         sticker.
                     </div>
-                    <Tabs
-                         defaultValue="overview"
-                         className="mx-auto w-full max-w-xl"
+               )}
+               {/* {role && vehicle.fairFlexImei && vehicle.fairFlexImei !== "" && (
+                    <Button
+                         className="mx-auto w-full max-w-xl rounded-xl bg-primary-800 text-white"
+                         asChild
+                         variant={"default"}
                     >
-                         <TabsList
-                              className={`grid ${
-                                   isOwing ? "grid-cols-2" : "grid-cols-1"
-                              }`}
+                         <Link
+                              href={`/vehicles/${vehicle.plate_number}/location`}
+                              className="shrink-0 whitespace-nowrap"
                          >
-                              <TabsTrigger value="overview">
-                                   OVERVIEW
-                              </TabsTrigger>
-                              {isOwing && (
-                                   <TabsTrigger value="days-owed">
-                                        DAYS OWED
-                                   </TabsTrigger>
+                              <MapPin className="mr-2 h-4 w-4 shrink-0" />
+                              View live location
+                         </Link>
+                    </Button>
+               )} */}
+               <Card
+                    className={`mx-auto min-h-[80svh] w-full max-w-4xl ${isVehicleClear ? "bg-emerald-600 md:bg-emerald-900/80" : "bg-destructive-foreground"} shadow-xl`}
+               >
+                    <CardHeader className="rounded-t-lg bg-primary text-center">
+                         <div className="rounded-t-lg bg-secondary py-3">
+                              <CardTitle className="text-lg font-bold">
+                                   <div className="text-sm font-light">
+                                        VEHICLE OWNER
+                                   </div>
+                                   <div className="mb-1">
+                                        {vehicle.owner.name}
+                                   </div>
+                                   <div className="text-sm font-light">
+                                        VEHICLE TYPE
+                                   </div>
+                                   <div className="mb-1">
+                                        {vehicle.category}
+                                   </div>
+                                   <div className="font-semibold">
+                                        NEXT PAYMENT DATE
+                                   </div>
+                                   <div
+                                        className={`text-lg font-bold uppercase ${isVehicleClear ? "text-emerald-600" : "text-destructive-foreground"}`}
+                                   >
+                                        {getNextPaymentDate(
+                                             Number(wallet.cvof_balance),
+                                             Number(wallet.cvof_owing),
+                                             vehicle.category as keyof typeof VehicleValues,
+                                        ).toLocaleDateString("en-US", {
+                                             year: "numeric",
+                                             month: "long",
+                                             day: "numeric",
+                                        })}
+                                   </div>
+                              </CardTitle>
+                         </div>
+                    </CardHeader>
+                    <CardContent className="p-2">
+                         <div className="mb-4 flex items-center justify-center">
+                              {isVehicleClear ? (
+                                   <div className="flex flex-col items-center space-x-2 text-white">
+                                        <CheckCircle2 className="h-20 w-20" />
+                                        <div className="text-xl font-medium">
+                                             Vehicle is clear!
+                                        </div>
+                                   </div>
+                              ) : (
+                                   <div className="flex flex-col items-center space-x-2 text-white">
+                                        <AlertTriangle className="h-20 w-20" />
+                                        <div className="text-xl font-medium">
+                                             You have overdue payment of
+                                        </div>
+                                        <div className="text-3xl font-bold">
+                                             ₦{CVOFOwing.toLocaleString()}
+                                        </div>
+                                   </div>
                               )}
-                         </TabsList>
-                         <TabsContent value="overview">
-                              {/* <Card className='grid gap-2 w-full p-3 bg-secondary text-xs lg:text-base'>
-							<div className='uppercase text-center font-bold pb-3'>
-								Payment Details
-							</div>
-							<div className=''>
-								<div className='flex justify-between items-center gap-5'>
-									<div className=''>Bank Name</div>
-									{vehicle.wallet.meta.bank_name}
-								</div>
-								<div className='flex justify-between items-center gap-5'>
-									<div className=''>
-										Account Name
-									</div>
-									{vehicle.wallet.meta.account_name}
-								</div>
-								<div className='flex justify-between items-center gap-5'>
-									<div className=''>
-										Account Number
-									</div>
-									{vehicle.wallet.meta.nuban}
-								</div>
-							</div>
-							<CopyButton
-								label='Copy Account Details'
-								text={`${vehicle.wallet.meta.bank_name} ${vehicle.wallet.meta.nuban} ${vehicle.wallet.meta.account_name}`}
-							/>
-						</Card> */}
-                              <div className="w-full">
-                                   {onWaiver ? (
-                                        <div className="mb-20 flex w-full flex-col items-center gap-2 p-3">
-                                             <div className="text-green-500">
-                                                  {successIcon}
-                                             </div>
-                                             <div className="flex py-2">
-                                                  <div className="shrink-0 grow-0 text-title1Bold">
-                                                       Vehicle is on Waiver!
-                                                  </div>
-                                             </div>
-                                             <Button asChild>
-                                                  <Link
-                                                       href={"waiver/history"}
-                                                       className="uppercase"
-                                                  >
-                                                       View Waiver History
-                                                  </Link>
-                                             </Button>
-                                        </div>
-                                   ) : isOwing ? (
-                                        <>
-                                             <div className="flex w-full flex-col items-center gap-2 p-3">
-                                                  <div className="text-red-500">
-                                                       {failureIcon}
-                                                  </div>
-                                                  <div className="flex flex-col items-center py-2">
-                                                       <div className="shrink-0 grow-0 text-title1Bold">
-                                                            Vehicle is Owing!
-                                                       </div>
-                                                       <div className="text-4xl font-bold text-destructive-foreground">
-                                                            {/* {`₦${
-												totalPendingAmount +
-												daysOwed.length * 20
-											}`} */}
-                                                            {`₦5,000`}
-                                                       </div>
-                                                  </div>
-                                             </div>
-                                        </>
-                                   ) : (
-                                        <div className="mb-20 flex w-full flex-col items-center gap-2 p-3">
-                                             <div className="text-green-500">
-                                                  {successIcon}
-                                             </div>
-                                             <div className="flex py-2">
-                                                  <div className="shrink-0 grow-0 text-title1Bold">
-                                                       Vehicle is clear!
-                                                  </div>
-                                             </div>
-                                        </div>
+                         </div>
+                         <Tabs className="mb-2 w-full" defaultValue="overview">
+                              <TabsList
+                                   className={`p-1" grid w-full ${role ? "grid-cols-4" : "grid-cols-3"} rounded-lg bg-muted`}
+                              >
+                                   <TabsTrigger
+                                        value="overview"
+                                        className="data-[state=active]:bg-background"
+                                   >
+                                        <User className="mr-2 h-5 w-5" />
+                                        <span className="hidden md:inline-block">
+                                             Overview
+                                        </span>
+                                   </TabsTrigger>
+                                   <TabsTrigger
+                                        value="vehicle"
+                                        className="data-[state=active]:bg-background"
+                                   >
+                                        <Car className="mr-2 h-5 w-5" />
+                                        <span className="hidden md:inline-block">
+                                             Vehicles
+                                        </span>
+                                   </TabsTrigger>
+                                   {role && (
+                                        <TabsTrigger
+                                             value="wallet"
+                                             className="data-[state=active]:bg-background"
+                                        >
+                                             <Wallet className="mr-2 h-5 w-5" />{" "}
+                                             <span className="hidden md:inline-block">
+                                                  Wallet
+                                             </span>
+                                        </TabsTrigger>
                                    )}
-                              </div>
-                         </TabsContent>
-                         {/* {isOwing && (
-					<TabsContent value='days-owed'>
-						<div className='w-full grid'>
-							<DataTable
-								showPagination
-								columns={debtColumns}
-								data={daysOwed}
-							/>
-						</div>
-					</TabsContent>
-				)} */}
-                    </Tabs>
-                    <div className="w-full">
-                         <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                              {role && (
-                                   <>
-                                        <DashboardCard
-                                             name="Vehicle Information"
-                                             href={`/vehicles/${vehicle.id}`}
-                                             image={"/personalinfo.png"}
-                                             description={
-                                                  "View Vehicle information"
+                                   <TabsTrigger
+                                        value="documents"
+                                        className="data-[state=active]:bg-background"
+                                   >
+                                        <FileText className="mr-2 h-5 w-5" />{" "}
+                                        <span className="hidden md:inline-block">
+                                             Documents
+                                        </span>
+                                   </TabsTrigger>
+                              </TabsList>
+                              <TabsContent value="overview" className="mt-2">
+                                   <div className="grid gap-2 md:grid-cols-2">
+                                        <InfoItem
+                                             label="T CODE"
+                                             value={vehicle.t_code}
+                                        />
+                                        <InfoItem
+                                             label="PLATE NUMBER"
+                                             value={vehicle.plate_number}
+                                        />
+                                        <InfoItem
+                                             label="STICKER"
+                                             className={
+                                                  hasSticker
+                                                       ? ""
+                                                       : "text-destructive-foreground"
+                                             }
+                                             value={
+                                                  hasSticker
+                                                       ? vehicle.barcode
+                                                       : "NO STICKER ADDED"
                                              }
                                         />
-
-                                        {role?.toLowerCase() !== "agent" && (
+                                        <InfoItem
+                                             label="FAREFLEX"
+                                             className={
+                                                  hasFareFlex
+                                                       ? ""
+                                                       : "text-destructive-foreground"
+                                             }
+                                             value={
+                                                  hasFareFlex
+                                                       ? vehicle.fairFlexImei
+                                                       : "NO FAREFLEX INSTALLED"
+                                             }
+                                        />
+                                   </div>
+                              </TabsContent>
+                              <TabsContent value="vehicle" className="mt-2">
+                                   <div className="grid gap-2 md:grid-cols-2">
+                                        <InfoItem
+                                             label="Chasis No"
+                                             value={
+                                                  vehicle.vin ??
+                                                  "NO CHASIS NUMBER"
+                                             }
+                                        />
+                                        <InfoItem
+                                             label="T CODE"
+                                             value={vehicle.t_code}
+                                        />
+                                        <InfoItem
+                                             label="STICKER ID"
+                                             value={
+                                                  vehicle.barcode ??
+                                                  "NO STICKER ID"
+                                             }
+                                        />
+                                        <InfoItem
+                                             label="CATEGORY"
+                                             value={vehicle.category}
+                                        />
+                                   </div>
+                                   {/* <div className="mt-3">
+                                        <h3 className="mb-2 font-semibold">
+                                             Vehicle Image
+                                        </h3>
+                                        <img
+                                             src={vehicle.image}
+                                             alt="Vehicle"
+                                             className="h-48 w-full rounded-lg object-cover"
+                                        />
+                                   </div> */}
+                              </TabsContent>
+                              {role && (
+                                   <TabsContent value="wallet" className="mt-2">
+                                        <div className="space-y-2">
+                                             {/* <div>
+                                             <h3 className="mb-2 font-semibold">
+                                                  Wallet Balance
+                                             </h3>
+                                             <Progress
+                                                  value={
+                                                       (CVOFBalance /
+                                                            (CVOFBalance +
+                                                                 CVOFOwing)) *
+                                                       100
+                                                  }
+                                                  className="h-4"
+                                             />
+                                             <div className="mt-2 flex justify-between">
+                                                  <span>
+                                                       ₦
+                                                       {CVOFBalance.toLocaleString()}
+                                                  </span>
+                                                  <span className="text-destructive">
+                                                       ₦
+                                                       {CVOFOwing.toLocaleString()}{" "}
+                                                       owing
+                                                  </span>
+                                             </div>
+                                        </div> */}
+                                             <div className="grid gap-2 md:grid-cols-2">
+                                                  {/* <InfoItem
+                                                  label="Total paid till date"
+                                                  value={`₦${Number(wallet.wallet_balance).toLocaleString()}`}
+                                             />
+                                             <InfoItem
+                                                  label="Amount Owed"
+                                                  value={`₦${Number(wallet.amount_owed).toLocaleString()}`}
+                                             /> */}
+                                                  <InfoItem
+                                                       label="Vehicle Balance"
+                                                       value={`₦${Number(wallet.cvof_balance).toLocaleString()}`}
+                                                  />
+                                                  <InfoItem
+                                                       label="Vehicle Owing"
+                                                       value={`₦${Number(wallet.cvof_owing).toLocaleString()}`}
+                                                  />
+                                                  <InfoItem
+                                                       label="FareFlex Balance"
+                                                       value={`₦${Number(wallet.fareflex_balance).toLocaleString()}`}
+                                                  />
+                                                  <InfoItem
+                                                       label="FareFlex Owing"
+                                                       value={`₦${Number(wallet.fareflex_owing).toLocaleString()}`}
+                                                  />
+                                                  {/* <InfoItem
+                                                  label="ISCE Balance"
+                                                  value={`₦${Number(wallet.isce_balance).toLocaleString()}`}
+                                                  />
+                                                  <InfoItem
+                                                  label="ISCE Owing"
+                                                  value={`₦${Number(wallet.isce_owing).toLocaleString()}`}
+                                             /> */}
+                                             </div>
+                                             <InfoItem
+                                                  label="Net Total"
+                                                  value={`₦${Number(wallet.net_total).toLocaleString()}`}
+                                             />
+                                        </div>
+                                   </TabsContent>
+                              )}
+                              <TabsContent value="documents" className="mt-2">
+                                   <div className="grid gap-2 md:grid-cols-2">
+                                        <InfoItem
+                                             label="Owner Name"
+                                             value={
+                                                  vehicle.owner.name ??
+                                                  "NO OWNER NAME"
+                                             }
+                                        />
+                                        <InfoItem
+                                             label="Gender"
+                                             value={
+                                                  vehicle.owner.gender ??
+                                                  "NO OWNER GENDER"
+                                             }
+                                        />
+                                        {role && (
                                              <>
-                                                  <DashboardCard
-                                                       name="Payment"
-                                                       href={`/vehicles/${vehicle.id}/payments`}
-                                                       image={"/payment.png"}
-                                                       description={
-                                                            "Make Payment & Check Payment History"
+                                                  <InfoItem
+                                                       label="Phone"
+                                                       value={
+                                                            vehicle.owner
+                                                                 .phone ??
+                                                            "NO OWNER PHONE"
                                                        }
                                                   />
-
-                                                  {/* <DashboardCard
-										name='Fines & Penalties'
-										href={`/vehicles/${vehicle.id}/fines`}
-										image={'/fineandpenal.png'}
-										description='Fine Driver & Check Fine Payment'
-									/> */}
+                                                  <InfoItem
+                                                       label="Marital Status"
+                                                       value={
+                                                            vehicle.owner
+                                                                 .marital_status ??
+                                                            "NO MARITAL STATUS"
+                                                       }
+                                                  />
+                                                  <InfoItem
+                                                       label="Address"
+                                                       value={
+                                                            vehicle.owner
+                                                                 .address ??
+                                                            "NO OWNER ADDRESS"
+                                                       }
+                                                  />
                                              </>
                                         )}
-                                   </>
-                              )}
-                         </div>
-                         {role && (
-                              <div className="flex flex-col gap-5">
-                                   {role?.toLowerCase() !== "agent" && (
-                                        <>
-                                             {/* <div className='flex flex-col gap-2'>
-									<div className='flex justify-between py-2'>
-										<div className='shrink-0 grow-0 text-title1Bold'>
-											Fine History
-										</div>
-										<div className='shrink-0 grow-0 text-title1Bold'>
-											<Button
-												asChild
-												variant='link'
-											>
-												<Link
-													href={`/vehicles/${vehicle.id}/fines`}
-												>
-													See all
-												</Link>
-											</Button>
-										</div>
-									</div>
-									<div className=''>
-										<DataTable
-											columns={
-												viewDriversColumns
-											}
-											data={VIEW_DRIVER_TABLE.slice(
-												0,
-												3
-											)}
-										/>
-									</div>
-								</div> */}
-                                             {/* <div className='flex flex-col gap-2 '>
-									<div className='flex justify-between py-2'>
-										<div className='shrink-0 grow-0 text-title1Bold'>
-											Payment History
-										</div>
-										<div className='shrink-0 grow-0 text-title1Bold'>
-											<Button
-												asChild
-												variant='link'
-											>
-												<Link
-													href={`/vehicles/${vehicle.id}/payments`}
-												>
-													See all
-												</Link>
-											</Button>
-										</div>
-									</div>
-									<div className=''>
-										<DataTable
-											columns={debtColumns}
-											data={vehicle.VehicleTransactions.slice(
-												0,
-												3
-											)}
-										/>
-									</div>
-								</div> */}
-                                        </>
-                                   )}
+                                   </div>
+                              </TabsContent>
+                         </Tabs>
+                    </CardContent>
+               </Card>
+          </div>
+     );
+}
 
-                                   {/* <div className='flex flex-col gap-2 mb-20'>
-							{vehicle.Drivers && (
-								<>
-									<div className='flex justify-between py-2'>
-										<div className='shrink-0 grow-0 text-title1Bold'>
-											Drivers
-										</div>
-										<div className='shrink-0 grow-0 text-title1Bold'>
-											<Button
-												asChild
-												variant='link'
-											>
-												<Link
-													href={`/vehicles/${vehicle.id}/drivers`}
-												>
-													See all
-												</Link>
-											</Button>
-										</div>
-									</div>
-									<div className=''>
-										<DataTable
-											columns={driversColumns}
-											data={vehicle.Drivers.slice(
-												0,
-												3
-											)}
-										/>
-									</div>
-								</>
-							)}
-						</div> */}
-                              </div>
-                         )}
-                    </div>
-               </div>
+function InfoItem({
+     label,
+     value,
+     className,
+}: {
+     label: string;
+     value: string;
+     className?: string;
+}) {
+     return (
+          <div className={cn("rounded-lg bg-white p-3 shadow", className)}>
+               <p className="text-sm text-muted-foreground">{label}</p>
+               <p className={cn("font-bold", className)}>{value}</p>
           </div>
      );
 }

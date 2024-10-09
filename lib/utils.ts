@@ -1,5 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { VehicleValues } from "./const";
+import { addDays, isSunday, subDays } from "date-fns";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -105,4 +107,39 @@ export function getInitials(name: string): string {
      }
 
      return words[0].charAt(0);
+}
+export function getNextPaymentDate(
+     cvofBalance: number,
+     cvofOwing: number,
+     vehicleCategory: keyof typeof VehicleValues,
+): Date {
+     const today = new Date();
+     let nextPaymentDate = new Date(today);
+
+     // Get the fee amount for the vehicle category
+     const dailyFee = VehicleValues[vehicleCategory];
+
+     console.log({ cvofBalance, cvofOwing, vehicleCategory, dailyFee });
+
+     if (cvofOwing > 0) {
+          // Vehicle is owing, calculate how many days in the past
+          const daysOwing = Math.floor(cvofOwing / dailyFee);
+          nextPaymentDate = subDays(today, daysOwing); // Set to past date
+
+          // Skip Sundays
+          while (isSunday(nextPaymentDate)) {
+               nextPaymentDate = subDays(nextPaymentDate, 1);
+          }
+     } else if (cvofBalance > 0) {
+          // Vehicle has paid, calculate how many days into the future
+          const daysPaid = Math.floor(cvofBalance / dailyFee);
+          nextPaymentDate = addDays(today, daysPaid); // Set to future date
+
+          // Skip Sundays
+          while (isSunday(nextPaymentDate)) {
+               nextPaymentDate = addDays(nextPaymentDate, 1);
+          }
+     }
+
+     return nextPaymentDate;
 }
