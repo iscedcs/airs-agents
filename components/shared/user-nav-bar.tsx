@@ -64,12 +64,12 @@ export function UserNav({ user }: { user: IUserExtended }) {
             </div>
             <div
               // href='/manage/profile'
-              className="flex flex-col space-y-1"
+              className="flex flex-col space-y-1 line-clamp-2"
             >
               <p className="text-sm font-medium leading-none">
                 {user.name || "Agent User"}
               </p>
-              <p className="text-xs leading-none text-muted-foreground">
+              <p className="text-xs leading-none text-muted-foreground text-start">
                 {user.email}
               </p>
             </div>
