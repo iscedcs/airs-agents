@@ -4,23 +4,28 @@ import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useSession } from 'next-auth/react'
 
 export function UpdateAnnouncementComponent() {
   const [isVisible, setIsVisible] = useState(false)
+  const {data: session, status} = useSession()
 
   useEffect(() => {
-    const hasSeenAnnouncement = localStorage.getItem('hasSeenUpdateAnnouncement')
+    if(session) {
+      const hasSeenAnnouncement = localStorage.getItem('hasSeenUpdateAnnouncement')
     if (!hasSeenAnnouncement) {
-      setIsVisible(true)
+      
     }
-  }, [])
+    setIsVisible(true)
+    }
+  }, [session])
 
   const handleDismiss = () => {
     setIsVisible(false)
     localStorage.setItem('hasSeenUpdateAnnouncement', 'true')
   }
 
-  if (!isVisible) return null
+  if (!isVisible || status === 'unauthenticated') return null
 
   return (
     <div className="fixed inset-0 bg-primary/50 bg-opacity-80 flex items-center justify-center z-50">

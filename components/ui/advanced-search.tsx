@@ -3,14 +3,13 @@
 import { loadingSpinner, searchIcon } from "@/lib/icons";
 import React, { useState, useCallback, useMemo, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { getVehicles } from "@/actions/vehicles";
 import type { vehicles } from "@prisma/client";
 import { useDebouncedCallback } from "use-debounce";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Car } from "lucide-react";
+import { getVehicles } from "@/app/actions/vehicles";
 
 export default function AdvancedSearch({
   placeholder,
