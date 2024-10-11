@@ -4,7 +4,6 @@ import SearchVehicle from "@/components/pages/vehicle/search-vehicle";
 export default function SearchPage({ params }: { params: { query: string } }) {
   return (
     <div className="w-full">
-    {/* <StatusPage params={{bcid : ""}}/> */}
       <SearchVehicle id={params.query} />
     </div>
   );

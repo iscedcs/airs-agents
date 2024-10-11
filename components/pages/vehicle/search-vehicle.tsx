@@ -377,8 +377,8 @@ function InfoItem({
 }) {
      return (
           <div className={cn("rounded-lg bg-white p-3 shadow", className)}>
-               <p className="text-sm text-muted-foreground">{label}</p>
-               <p className={cn("font-bold", className)}>{value}</p>
+               <p className="text-sm text-muted-foreground dark:text-background">{label}</p>
+               <p className={cn("font-bold dark:text-background", className)}>{value}</p>
           </div>
      );
 }
