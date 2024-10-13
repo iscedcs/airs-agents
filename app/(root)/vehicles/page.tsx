@@ -1,6 +1,6 @@
 import { options } from "@/app/api/auth/options";
 import { PaginationISCE } from "@/components/shared/pagination-isce";
-import AgentSearchBar from "@/components/ui/agent-search-bar";
+import AgentAdvancedVehicleSearch from "@/components/ui/agent-advanced-search-bar";
 import { buttonVariants } from "@/components/ui/button";
 import { vehiclesColumns } from "@/components/ui/table/columns";
 import { DataTable } from "@/components/ui/table/data-table";
@@ -74,7 +74,11 @@ export default async function Vehicles({
                     </>
                ) : (
                     <div className="mx-auto mt-10 grid h-full w-full max-w-[500px] place-items-center">
-                         <AgentSearchBar
+                         {/* <AgentSearchBar
+                              placeholder="Enter T-Code"
+                              variant="primary"
+                         /> */}
+                         <AgentAdvancedVehicleSearch
                               placeholder="Enter T-Code"
                               variant="primary"
                          />

@@ -350,6 +350,8 @@ enum drivers_status_enum {
 enum users_role_enum {
   SUPERADMIN
   ADMIN
+  AIRS_ADMIN
+  AIRS_AGENT
   AGENT
   GREEN_ENGINE
   COMPLIANCE

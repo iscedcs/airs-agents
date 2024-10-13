@@ -1,6 +1,7 @@
+import BarcodeAdder from "@/components/layout/barcode-adder";
+import DashboardCard from "@/components/layout/dashboard-card";
 import FormError from "@/components/shared/form-error";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FormMessage } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VehicleValues } from "@/lib/const";
 import { getVehicleById, getVehicleByTCodeOrPlateNumber } from "@/lib/controllers/vehicle-controller";
@@ -13,10 +14,11 @@ import {
      Car,
      CheckCircle2,
      FileText,
+     History,
      User,
      Wallet,
 } from "lucide-react";
-import { notFound } from "next/navigation";
+import PaymentHistory from "./payment-history";
 
 export async function generateMetadata({
      params,
@@ -129,7 +131,7 @@ export default async function StatusPage({
                          </div>
                          <Tabs className="mb-2 w-full" defaultValue="overview">
                               <TabsList
-                                   className={`p-1" grid w-full ${role ? "grid-cols-4" : "grid-cols-3"} rounded-lg bg-muted`}
+                                   className={`p-1" grid w-full ${role ? "grid-cols-5" : "grid-cols-3"} rounded-lg bg-muted`}
                               >
                                    <TabsTrigger
                                         value="overview"
@@ -167,6 +169,15 @@ export default async function StatusPage({
                                         <FileText className="mr-2 h-5 w-5" />{" "}
                                         <span className="hidden md:inline-block">
                                              Documents
+                                        </span>
+                                   </TabsTrigger>
+                                   <TabsTrigger
+                                        value="payment-history"
+                                        className="data-[state=active]:bg-background"
+                                   >
+                                        <History className="mr-2 h-4 w-4" />
+                                        <span className="hidden md:inline-block">
+                                             History
                                         </span>
                                    </TabsTrigger>
                               </TabsList>
@@ -359,7 +370,244 @@ export default async function StatusPage({
                                         )}
                                    </div>
                               </TabsContent>
+                              <TabsContent
+                                   value="payment-history"
+                                   className="mt-2"
+                              >
+                                   <div className="space-y-2">
+                                        <div className="mt-2">
+                                             <PaymentHistory
+                                                  filter={{
+                                                       tcode: vehicle.t_code,
+                                                  }}
+                                             />
+                                        </div>{" "}
+                                   </div>
+                              </TabsContent>
+
                          </Tabs>
+
+                         {role && (
+                              <div className="mx-auto w-full max-w-6xl">
+                                   <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+                                        <>
+                                             {/* {role.toLowerCase() ===
+                                                  "superadmin" ||
+                                                  (role.toLowerCase() ===
+                                                       "admin" && (
+                                                       <ViewRegistrar
+                                                            id={vehicle.id}
+                                                            name="View Registrar"
+                                                            image={
+                                                                 "/registrar.jpg"
+                                                            }
+                                                            description={
+                                                                 "Check who onboarded this vehicle"
+                                                            }
+                                                            t_code={
+                                                                 vehicle.t_code
+                                                            }
+                                                            plate_number={
+                                                                 vehicle.plate_number
+                                                            }
+                                                       />
+                                                  ))} */}
+                                             {role?.toLowerCase() !==
+                                                  "green_engine" && (
+                                                  <>
+                                                       <DashboardCard
+                                                            name="Vehicle Information"
+                                                            href={`/vehicles/${vehicle.id}/edit`}
+                                                            image={
+                                                                 "/personalinfo.png"
+                                                            }
+                                                            description={
+                                                                 "View Vehicle information"
+                                                            }
+                                                       />
+
+                                                       {vehicle?.barcode ===
+                                                            "" ||
+                                                       !vehicle?.barcode ? (
+                                                            <div className="">
+                                                                 {isValidCategory && (
+                                                                      <BarcodeAdder
+                                                                           id={
+                                                                                vehicle.id
+                                                                           }
+                                                                           name="Add Sticker"
+                                                                           image={
+                                                                                "/payment.png"
+                                                                           }
+                                                                           description={
+                                                                                "Scan to add sticker to vehicle"
+                                                                           }
+                                                                           t_code={
+                                                                                vehicle.t_code
+                                                                           }
+                                                                      />
+                                                                 )}
+                                                            </div>
+                                                       ) : (
+                                                            <></>
+                                                       )}
+                                                  </>
+                                             )}
+                                             {/* {role?.toLowerCase() ===
+                                             "green_engine" ? (
+                                                  vehicle?.fairFlexImei ===
+                                                       "" ||
+                                                  !vehicle?.fairFlexImei ? (
+                                                       <>
+                                                            <FareFlexAdder
+                                                                 id={vehicle.id}
+                                                                 name="Add Fare Flex Device"
+                                                                 image={
+                                                                      "/fareflex.png"
+                                                                 }
+                                                                 description={
+                                                                      "Add fareflex imei to vehicle"
+                                                                 }
+                                                            />
+                                                            <NextOfKinAdder
+                                                                 vehicle={
+                                                                      vehicle
+                                                                 }
+                                                                 name="Update Vehicle Info"
+                                                                 image={
+                                                                      "/tricycle.jpg"
+                                                                 }
+                                                                 description={
+                                                                      "Fareflex installation details"
+                                                                 }
+                                                            />
+                                                       </>
+                                                  ) : (
+                                                       <></>
+                                                  )
+                                             ) : (
+                                                  <></>
+                                             )} */}
+                                             {/* {role?.toLowerCase() !== "agent" && (
+                                        <>
+                                             <DashboardCard
+                                                  name="Payment"
+                                                  href={`/vehicles/${vehicle.id}/payments`}
+                                                  image={"/payment.png"}
+                                                  description={
+                                                       "Make Payment & Check Payment History"
+                                                  }
+                                             />
+
+                                             <DashboardCard
+										name='Fines & Penalties'
+										href={`/vehicles/${vehicle.id}/fines`}
+										image={'/fineandpenal.png'}
+										description='Fine Driver & Check Fine Payment'
+									/>
+                                        </>
+                                   )} */}
+                                        </>
+                                   </div>
+                                   <div className="flex flex-col gap-5">
+                                        {role?.toLowerCase() !== "agent" && (
+                                             <>
+                                                  {/* <div className='flex flex-col gap-2'>
+									<div className='flex justify-between py-2'>
+										<div className='shrink-0 grow-0 text-title1Bold'>
+											Fine History
+										</div>
+										<div className='shrink-0 grow-0 text-title1Bold'>
+											<Button
+												asChild
+												variant='link'
+											>
+												<Link
+													href={`/vehicles/${vehicle.id}/fines`}
+												>
+													See all
+												</Link>
+											</Button>
+										</div>
+									</div>
+									<div className=''>
+										<DataTable
+											columns={
+												viewDriversColumns
+											}
+											data={VIEW_DRIVER_TABLE.slice(
+												0,
+												3
+											)}
+										/>
+									</div>
+								</div> */}
+                                                  {/* <div className='flex flex-col gap-2 '>
+									<div className='flex justify-between py-2'>
+										<div className='shrink-0 grow-0 text-title1Bold'>
+											Payment History
+										</div>
+										<div className='shrink-0 grow-0 text-title1Bold'>
+											<Button
+												asChild
+												variant='link'
+											>
+												<Link
+													href={`/vehicles/${vehicle.id}/payments`}
+												>
+													See all
+												</Link>
+											</Button>
+										</div>
+									</div>
+									<div className=''>
+										<DataTable
+											columns={debtColumns}
+											data={vehicle.VehicleTransactions.slice(
+												0,
+												3
+											)}
+										/>
+									</div>
+								</div> */}
+                                             </>
+                                        )}
+
+                                        {/* <div className='flex flex-col gap-2 mb-20'>
+							{vehicle.Drivers && (
+								<>
+									<div className='flex justify-between py-2'>
+										<div className='shrink-0 grow-0 text-title1Bold'>
+											Drivers
+										</div>
+										<div className='shrink-0 grow-0 text-title1Bold'>
+											<Button
+												asChild
+												variant='link'
+											>
+												<Link
+													href={`/vehicles/${vehicle.id}/drivers`}
+												>
+													See all
+												</Link>
+											</Button>
+										</div>
+									</div>
+									<div className=''>
+										<DataTable
+											columns={driversColumns}
+											data={vehicle.Drivers.slice(
+												0,
+												3
+											)}
+										/>
+									</div>
+								</>
+							)}
+						</div> */}
+                                   </div>
+                              </div>
+                         )}
                     </CardContent>
                </Card>
           </div>

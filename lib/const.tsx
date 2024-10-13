@@ -28,6 +28,10 @@ export const SLIDES = [
     // 	/>
     // </>,
 ];
+export const FNTC = new Intl.NumberFormat("en-NG", {
+     currency: "NGN",
+     style: "currency",
+});
 export const LOGIN_DETAILS = [
   {
     title: "User ID",

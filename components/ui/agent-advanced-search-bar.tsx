@@ -12,7 +12,7 @@ import { Car } from "lucide-react";
 import { getVehicles } from "@/app/actions/vehicles";
 import FormError from "../shared/form-error";
 
-export default function AdvancedSearch({
+export default function AgentAdvancedVehicleSearch({
   placeholder,
   variant,
 }: {
@@ -38,7 +38,7 @@ export default function AdvancedSearch({
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      router.push(`/search/${searchValue}`);
+      router.push(`/vehicles/search/${searchValue}`);
     },
     [router, searchValue]
   );
@@ -99,32 +99,31 @@ export default function AdvancedSearch({
                         </div>
                         <div className="flex-1 space-y-1">
                           <p className="text-sm font-medium leading-none">
-                            <Highlighted
+                            {/* <Highlighted
                               content={vehicle.plate_number}
                               query={searchValue}
                             />
                           </p>
                           <p className="text-sm text-muted-foreground">
                             <Highlighted
-                              /* @ts-ignore */
-                              content={vehicle.owner.name}
+                              // content={vehicle.owner.name}
+                              // query={searchValue}
+                            /> */}
+                            <Highlighted
+                              content={vehicle.t_code}
                               query={searchValue}
                             />
-                            <Highlighted
-                              content={vehicle.asin_number}
-                              query={searchValue}
-                            />
-                            <Highlighted
+                            {/* <Highlighted
                               content={vehicle.vin}
                               query={searchValue}
-                            />
+                            /> */}
                           </p>
                         </div>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() =>
-                            router.push(`/search/${vehicle.plate_number}`)
+                            router.push(`/vehicles/search/${vehicle.t_code}`)
                           }
                         >
                           View
@@ -135,7 +134,7 @@ export default function AdvancedSearch({
                 </ul>
               ) : (
                 <div className="flex items-center text-center mx-auto justify-center h-full">
-                  <FormError message="No Vehicle Found"/>
+                  <FormError message="No Vehicle Found With This T-Code"/>
                 </div>
               )}
             </ScrollArea>
