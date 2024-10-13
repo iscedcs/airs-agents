@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Car } from "lucide-react";
-import { getVehicles } from "@/app/actions/vehicles";
+import { getVehicles, getVehiclesTCode } from "@/app/actions/vehicles";
 import FormError from "../shared/form-error";
 
 export default function AgentAdvancedVehicleSearch({
@@ -46,7 +46,7 @@ export default function AgentAdvancedVehicleSearch({
   const search = useDebouncedCallback(async (value: string) => {
     if (value.trim()) {
       startTransition(async () => {
-        const result = await getVehicles(1, 10, { search: value });
+        const result = await getVehiclesTCode(1, 10, { search: value });
         setSearchVehicles(result?.vehicles || []);
       });
     } else {

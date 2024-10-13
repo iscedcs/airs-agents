@@ -76,6 +76,63 @@ export type VehicleFilter = {
        },
      };
    }
+   export async function getVehiclesTCode(
+     page: number = 1,
+     pageSize: number = 10,
+     filter: VehicleFilter = {}
+   ) {
+     const where: Prisma.vehiclesWhereInput = {};
+   
+     if (filter.status) {
+       where.status = filter.status;
+     }
+   
+     if (filter.category) {
+       where.category = filter.category;
+     }
+   
+     if (filter.type) {
+       where.type = filter.type;
+     }
+   
+     if (filter.search) {
+       where.OR = [
+         { t_code: { contains: filter.search, mode: "insensitive" } },
+       ];
+     }
+   
+     const [vehicles, totalCount] = await db.$transaction([
+       db.vehicles.findMany({
+         where,
+         select: {
+           id: true,
+           plate_number: true,
+           color: true,
+           category: true,
+           type: true,
+           status: true,
+           asin_number: true,
+           t_code: true,
+           created_at: true,
+           owner: true,
+         },
+         skip: (page - 1) * pageSize,
+         take: pageSize,
+         orderBy: { created_at: "desc" },
+       }),
+       db.vehicles.count({ where }),
+     ]);
+   
+     return {
+       vehicles,
+       pagination: {
+         page,
+         pageSize,
+         totalCount,
+         totalPages: Math.ceil(totalCount / pageSize),
+       },
+     };
+   }
 
 export const allVehicles = async ({
      page = 1,
